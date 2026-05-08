@@ -9,7 +9,7 @@ export default function Footer() {
       }}
     >
       <p>
-        © 2025{' '}
+        © 2026{' '}
         <span style={{ color: 'var(--cyan)' }}>Jhon Rojas</span>
         {' '}· Sistemas AI para Negocios · Bogotá, Colombia
       </p>
