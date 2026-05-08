@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADH Coaching · CRM</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh;color:#1a1a2e}
+.hero{background:linear-gradient(135deg,#0a4a8a,#1565c0,#1976d2);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.brand{display:flex;align-items:center;gap:10px}
+.av{width:40px;height:40px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#1565c0}
+.bn{font-size:15px;font-weight:600;color:#fff}
+.bs{font-size:11px;color:#B5D4F4}
+.status-pill{font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.3)}
+.status-ok{background:rgba(22,163,74,0.3);color:#fff}
+.status-err{background:rgba(220,38,38,0.3);color:#fff}
+.status-loading{background:rgba(255,255,255,0.2);color:#fff}
+.nav{display:flex;background:#fff;border-bottom:1px solid #e2e8f0;overflow-x:auto;padding:0 16px}
+.nb{padding:11px 13px;font-size:12px;color:#64748b;background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;font-weight:500}
+.nb.on{color:#1565c0;border-bottom:3px solid #1565c0}
+.nb:hover{color:#1565c0}
+.body{padding:14px;max-width:960px;margin:0 auto}
+.sec{display:none}.sec.on{display:block}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.ct{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.badge{display:inline-block;font-size:11px;padding:3px 8px;border-radius:20px;font-weight:600}
+.bh{background:#fee2e2;color:#991b1b}
+.bw{background:#fef3c7;color:#92400e}
+.bc{background:#dbeafe;color:#1e40af}
+.bx{background:#dcfce7;color:#166534}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:#f8fafc;border-radius:10px;padding:12px 14px;border:1px solid #e2e8f0}
+.sl{font-size:11px;color:#64748b;margin-bottom:4px}
+.sv{font-size:22px;font-weight:700;color:#1a1a2e}
+.ss{font-size:11px;color:#64748b;margin-top:2px}
+.pbar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
+.pfill{height:100%;border-radius:4px;transition:width 0.4s}
+table{width:100%;font-size:12px;border-collapse:collapse}
+th{font-size:11px;font-weight:600;color:#475569;text-align:left;padding:8px 10px;border-bottom:1px solid #e2e8f0;background:#f8fafc;text-transform:uppercase;letter-spacing:0.04em}
+td{padding:10px;border-bottom:1px solid #f1f5f9;color:#1a1a2e;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8fafc}
+.abtn{font-size:11px;padding:4px 10px;border-radius:8px;border:1px solid #e2e8f0;background:none;cursor:pointer;color:#64748b;margin-right:4px}
+.abtn:hover{background:#f1f5f9}
+.abtn.danger{border-color:#fca5a5;color:#dc2626}
+.abtn.danger:hover{background:#fee2e2}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;font-weight:600;color:#475569}
+.fg input,.fg select,.fg textarea{font-size:13px;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#1a1a2e;outline:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#2563eb}
+.fg.full{grid-column:1/-1}
+.btn-main{padding:10px 20px;background:#1565c0;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-main:hover{background:#1976d2}
+.btn-main:disabled{background:#93c5fd;cursor:not-allowed}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;color:#fff;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;max-width:300px}
+.toast.show{opacity:1}
+.toast.ok{background:#16a34a}
+.toast.err{background:#dc2626}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:40px;color:#94a3b8;font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;background:#16a34a;display:inline-block;animation:pulse 2s infinite;margin-right:6px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.conn-badge{display:flex;align-items:center;font-size:12px;color:#166534;background:#dcfce7;padding:8px 12px;border-radius:8px;border:1px solid #86efac;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="brand">
+    <div class="av">ADH</div>
+    <div>
+      <div class="bn">ADH Coaching · CRM de Ventas</div>
+      <div class="bs">Academia de Desarrollo Humano · Jhon Rojas</div>
+    </div>
+  </div>
+  <div class="status-pill status-loading" id="db-status">⚡ Conectando...</div>
+</div>
+
+<div class="nav">
+  <button class="nb on" onclick="show('dash',this)">Dashboard</button>
+  <button class="nb" onclick="show('leads',this);loadLeads()">Leads</button>
+  <button class="nb" onclick="show('nuevo',this)">Agregar lead</button>
+  <button class="nb" onclick="show('bot',this)">Script bot</button>
+  <button class="nb" onclick="show('objeciones',this)">Objeciones</button>
+  <button class="nb" onclick="show('comisiones',this)">Comisiones</button>
+</div>
+
+<div class="body">
+
+  <div id="dash" class="sec on">
+    <div class="conn-badge" id="conn-badge" style="display:none">
+      <span class="dot"></span>
+      Conectado a Supabase · Datos en tiempo real
+    </div>
+    <div class="sgrid">
+      <div class="stat"><div class="sl">Total leads</div><div class="sv" id="s-total">—</div><div class="ss">en base de datos</div></div>
+      <div class="stat"><div class="sl">Calientes 🔥</div><div class="sv" style="color:#dc2626" id="s-hot">—</div><div class="ss">listos para cerrar</div></div>
+      <div class="stat"><div class="sl">Cerrados ✅</div><div class="sv" style="color:#16a34a" id="s-closed">—</div><div class="ss">certificaciones</div></div>
+      <div class="stat"><div class="sl">Comisión</div><div class="sv" style="color:#16a34a;font-size:16px" id="s-rev">—</div><div class="ss">COP ganado</div></div>
+    </div>
+    <div class="two">
+      <div class="card">
+        <div class="ct">Pipeline</div>
+        <div id="pipeline-wrap"><div class="empty">Cargando...</div></div>
+      </div>
+      <div class="card">
+        <div class="ct">Últimos leads</div>
+        <div id="recent-wrap"><div class="empty">Cargando...</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Certificación ADH · Info del producto</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;font-size:12px">
+        <div><div style="color:#64748b;font-size:11px;margin-bottom:2px">Duración</div><div style="font-weight:600">10 meses · 416 horas</div></div>
+        <div><div style="color:#64748b;font-size:11px;margin-bottom:2px">Aval</div><div style="font-weight:600">Universidad de Florida</div></div>
+        <div><div style="color:#64748b;font-size:11px;margin-bottom:2px">Clases</div><div style="font-weight:600">Mar 6–8:30pm + 1 sáb/mes</div></div>
+        <div><div style="color:#64748b;font-size:11px;margin-bottom:2px">Contado</div><div style="font-weight:600">$3.700.000 + $300k mat.</div></div>
+        <div><div style="color:#64748b;font-size:11px;margin-bottom:2px">Cuotas</div><div style="font-weight:600">Máx 10 · $4.800.000</div></div>
+        <div><div style="color:#64748b;font-size:11px;margin-bottom:2px">WhatsApp</div><div style="font-weight:600">+57 300 680 0524</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="leads" class="sec">
+    <div class="card">
+      <div class="ct">Todos los leads <span id="lead-count" style="font-size:12px;font-weight:400;color:#64748b"></span></div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Nombre</th><th>WhatsApp</th><th>Ciudad</th><th>Estado</th><th>Pago</th><th>Fuente</th><th>Notas</th><th>Fecha</th><th>Acciones</th></tr></thead>
+          <tbody id="leads-tbody"><tr><td colspan="9" style="text-align:center;padding:30px;color:#94a3b8">Cargando desde Supabase...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="nuevo" class="sec">
+    <div class="card">
+      <div class="ct">Agregar nuevo lead · Se guarda en Supabase</div>
+      <div class="form-grid">
+        <div class="fg"><label>Nombre completo *</label><input type="text" id="f-nombre" placeholder="Ej: Valentina Gómez"></div>
+        <div class="fg"><label>WhatsApp</label><input type="text" id="f-phone" placeholder="+57 300 000 0000"></div>
+        <div class="fg"><label>Ciudad</label><input type="text" id="f-ciudad" placeholder="Bogotá"></div>
+        <div class="fg"><label>Estado</label>
+          <select id="f-estado">
+            <option value="cold">Frío</option>
+            <option value="warm">Tibio</option>
+            <option value="hot">Caliente</option>
+          </select>
+        </div>
+        <div class="fg"><label>Pago preferido</label>
+          <select id="f-pago">
+            <option value="">Sin definir</option>
+            <option value="contado">Contado · $3.700.000</option>
+            <option value="cuotas">Cuotas · máx 10</option>
+          </select>
+        </div>
+        <div class="fg"><label>Fuente</label>
+          <select id="f-fuente">
+            <option>Meta Ads</option>
+            <option>WhatsApp directo</option>
+            <option>Referido</option>
+            <option>Instagram</option>
+            <option>Facebook</option>
+            <option>TikTok</option>
+          </select>
+        </div>
+        <div class="fg full"><label>Notas · dolor del cliente</label>
+          <textarea id="f-notas" rows="3" placeholder="Ej: Quiere transformar su liderazgo, tiene negocio propio..."></textarea>
+        </div>
+        <div class="full"><button class="btn-main" id="btn-save" onclick="saveLead()">Guardar lead en Supabase</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bot" class="sec">
+    <div class="card">
+      <div class="ct">Flujo del chatbot · Las 3 preguntas de cierre</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:#f0fdf4;border-radius:10px;padding:14px;border-left:4px solid #16a34a">
+          <div style="font-size:11px;font-weight:700;color:#166534;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Mensaje 1 · Bienvenida automática</div>
+          <div style="font-size:13px;color:#1a1a2e;line-height:1.7">¡Hola! Gracias por contactarnos. Soy Jhon Rojas, Coach Ontológico Certificado de la Academia de Desarrollo Humano ADH.<br><br>1️⃣ ¿Cuál es tu nombre?<br>2️⃣ ¿Desde qué ciudad nos escribes?</div>
+        </div>
+        <div style="background:#eff6ff;border-radius:10px;padding:14px;border-left:4px solid #2563eb">
+          <div style="font-size:11px;font-weight:700;color:#1e40af;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Pregunta 1 · Descubrir el dolor</div>
+          <div style="font-size:13px;color:#1a1a2e;line-height:1.7"><strong>¿Qué te llevó a buscar información sobre desarrollo personal justo en este momento de tu vida?</strong></div>
+        </div>
+        <div style="background:#eff6ff;border-radius:10px;padding:14px;border-left:4px solid #2563eb">
+          <div style="font-size:11px;font-weight:700;color:#1e40af;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Pregunta 2 · Anclar el deseo</div>
+          <div style="font-size:13px;color:#1a1a2e;line-height:1.7"><strong>Si pudieras transformar UN aspecto de tu vida en los próximos 10 meses, ¿cuál sería y cómo cambiaría todo lo demás?</strong></div>
+        </div>
+        <div style="background:#eff6ff;border-radius:10px;padding:14px;border-left:4px solid #2563eb">
+          <div style="font-size:11px;font-weight:700;color:#1e40af;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Pregunta 3 · Medir seriedad</div>
+          <div style="font-size:13px;color:#1a1a2e;line-height:1.7"><strong>¿Qué tan importante es para ti contar con una certificación internacional que respalde ese cambio personal y profesionalmente?</strong></div>
+        </div>
+        <div style="background:#fee2e2;border-radius:10px;padding:14px;border-left:4px solid #dc2626">
+          <div style="font-size:11px;font-weight:700;color:#991b1b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">🔥 Alerta lead caliente → notificación a Jhon</div>
+          <div style="font-size:13px;color:#1a1a2e;line-height:1.7">LEAD CALIENTE: [nombre] de [ciudad] listo para cerrar.<br>Contáctalo ahora: [teléfono] → +57 300 680 0524</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="objeciones" class="sec">
+    <div class="card">
+      <div class="ct">Manejo de objeciones · Closer ADH</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
+          <div style="background:#fef3c7;padding:12px 14px;font-size:13px;font-weight:600;color:#92400e">"No tengo tiempo para el sábado del mes"</div>
+          <div style="padding:14px;font-size:13px;line-height:1.7;color:#1a1a2e">Solo es <strong>UN sábado al mes de 6 a 8:30pm</strong> — 2.5 horas, una vez al mes.<br><br><em>Pregunta de cierre:</em> "Si ese único sábado te da una certificación internacional, ¿es inversión o gasto de tiempo?"</div>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
+          <div style="background:#dbeafe;padding:12px 14px;font-size:13px;font-weight:600;color:#1e40af">"No sé qué es el coaching ontológico"</div>
+          <div style="padding:14px;font-size:13px;line-height:1.7;color:#1a1a2e">Es una metodología científica para transformar la forma en que <strong>piensas, conversas y tomas decisiones</strong>.<br><br><em>Pregunta de cierre:</em> "¿Qué área necesita más transformación hoy: liderazgo, relaciones, negocio o propósito?"</div>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
+          <div style="background:#fef3c7;padding:12px 14px;font-size:13px;font-weight:600;color:#92400e">"Tengo que organizar mi agenda"</div>
+          <div style="padding:14px;font-size:13px;line-height:1.7;color:#1a1a2e">Las personas exitosas no esperan tener tiempo, <strong>lo crean para lo que importa</strong>.<br><br><em>Pregunta de cierre:</em> "¿Qué necesitas organizar exactamente para confirmar tu lugar hoy? Los cupos son limitados."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="comisiones" class="sec">
+    <div class="card">
+      <div class="ct">Calculadora de comisiones</div>
+      <div style="margin-bottom:16px">
+        <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;margin-bottom:8px"><input type="radio" name="pt" value="contado" onchange="calcC()" checked> Contado · $3.700.000 + $300k matrícula</label>
+        <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer"><input type="radio" name="pt" value="cuotas" onchange="calcC()"> Cuotas máx 10 · $4.800.000 + $300k matrícula</label>
+      </div>
+      <div class="two" style="margin-bottom:16px">
+        <div style="background:#f0fdf4;border-radius:10px;padding:16px;text-align:center;border:1px solid #86efac">
+          <div style="font-size:12px;color:#166534;margin-bottom:4px">Tu comisión total</div>
+          <div style="font-size:28px;font-weight:700;color:#166534" id="c-total">$2.405.000</div>
+          <div style="font-size:11px;color:#16a34a;margin-top:3px" id="c-sub">Matrícula + 65% de $3.7M</div>
+        </div>
+        <div style="font-size:12px" id="c-breakdown"></div>
+      </div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">Simulador de ingresos</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:12px;color:#64748b">Cierres al mes:</span>
+        <input type="range" min="1" max="15" value="3" step="1" id="sl" oninput="simC()" style="flex:1">
+        <span style="font-size:14px;font-weight:700;min-width:24px" id="sl-n">3</span>
+      </div>
+      <div class="two">
+        <div style="background:#f8fafc;border-radius:8px;padding:12px;text-align:center;border:1px solid #e2e8f0">
+          <div style="font-size:11px;color:#64748b;margin-bottom:3px">Todos contado</div>
+          <div style="font-size:18px;font-weight:700;color:#1565c0" id="sim-c">$7.215.000</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:8px;padding:12px;text-align:center;border:1px solid #e2e8f0">
+          <div style="font-size:11px;color:#64748b;margin-bottom:3px">Todos cuotas</div>
+          <div style="font-size:18px;font-weight:700;color:#1565c0" id="sim-q">$9.360.000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL = 'https://udmnohwwufpdsnoroaha.supabase.co';
+const SUPA_KEY = 'sb_publishable_IxQL9FM46jJvQ2zFCeUYgw_pKnxcBU-';
+
+const { createClient } = supabase;
+const db = createClient(SUPA_URL, SUPA_KEY);
+
+async function init() {
+  const el = document.getElementById('db-status');
+  try {
+    const { data, error } = await db.from('leads').select('*').limit(1);
+    if (error) throw error;
+    el.textContent = '✅ Supabase conectado';
+    el.className = 'status-pill status-ok';
+    document.getElementById('conn-badge').style.display = 'flex';
+    loadDash();
+  } catch(e) {
+    el.textContent = '❌ Error: ' + e.message;
+    el.className = 'status-pill status-err';
+    console.error(e);
+  }
+}
+
+async function loadDash() {
+  try {
+    const { data } = await db.from('leads').select('*').order('created_at', {ascending: false});
+    const leads = data || [];
+    const hot = leads.filter(l=>l.estado==='hot').length;
+    const closed = leads.filter(l=>l.estado==='closed').length;
+    const cold = leads.filter(l=>l.estado==='cold').length;
+    const warm = leads.filter(l=>l.estado==='warm').length;
+    const total = leads.length;
+
+    document.getElementById('s-total').textContent = total;
+    document.getElementById('s-hot').textContent = hot;
+    document.getElementById('s-closed').textContent = closed;
+    document.getElementById('s-rev').textContent = '$' + (closed*2405000).toLocaleString('es-CO');
+
+    const pw = document.getElementById('pipeline-wrap');
+    pw.innerHTML = total === 0 ? '<div class="empty">Sin leads aún</div>' :
+      [['Fríos',cold,'#2563eb'],['Tibios',warm,'#d97706'],['Calientes',hot,'#dc2626'],['Cerrados',closed,'#16a34a']]
+      .map(([l,c,col])=>`<div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:#64748b">${l}</span><span style="font-weight:600">${c}</span></div>
+        <div class="pbar"><div class="pfill" style="width:${total?Math.round(c/total*100):0}%;background:${col}"></div></div>
+      </div>`).join('');
+
+    const rw = document.getElementById('recent-wrap');
+    rw.innerHTML = leads.length === 0 ? '<div class="empty">Sin leads</div>' :
+      leads.slice(0,5).map(l=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
+          <div><div style="font-size:13px;font-weight:600">${l.nombre}</div><div style="font-size:11px;color:#64748b">${l.ciudad||'—'} · ${l.fuente||'—'}</div></div>
+          ${badge(l.estado)}
+        </div>`).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function loadLeads() {
+  const tb = document.getElementById('leads-tbody');
+  try {
+    const { data, error } = await db.from('leads').select('*').order('created_at',{ascending:false});
+    if(error) throw error;
+    const leads = data||[];
+    document.getElementById('lead-count').textContent = '('+leads.length+' leads)';
+    tb.innerHTML = leads.length===0
+      ? '<tr><td colspan="9" style="text-align:center;padding:30px;color:#94a3b8">Sin leads. ¡Agrega el primero!</td></tr>'
+      : leads.map(l=>`<tr>
+          <td style="font-weight:600">${l.nombre}</td>
+          <td style="color:#64748b">${l.whatsapp||'—'}</td>
+          <td style="color:#64748b">${l.ciudad||'—'}</td>
+          <td>${badge(l.estado)}</td>
+          <td style="color:#64748b">${l.pago||'—'}</td>
+          <td style="color:#64748b">${l.fuente||'—'}</td>
+          <td style="color:#64748b;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.notas||'—'}</td>
+          <td style="color:#94a3b8;font-size:11px">${new Date(l.created_at).toLocaleDateString('es-CO')}</td>
+          <td>
+            <button class="abtn" onclick="changeStatus('${l.id}','hot')" title="Caliente">🔥</button>
+            <button class="abtn" onclick="changeStatus('${l.id}','closed')" title="Cerrado">✅</button>
+            <button class="abtn danger" onclick="delLead('${l.id}')">×</button>
+          </td>
+        </tr>`).join('');
+  } catch(e) {
+    tb.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;color:#dc2626">Error: ${e.message}</td></tr>`;
+  }
+}
+
+async function saveLead() {
+  const nombre = document.getElementById('f-nombre').value.trim();
+  if(!nombre){showToast('El nombre es obligatorio','err');return;}
+  const btn = document.getElementById('btn-save');
+  btn.innerHTML = '<span class="loader"></span>Guardando...';
+  btn.disabled = true;
+  try {
+    const {error} = await db.from('leads').insert({
+      nombre,
+      whatsapp: document.getElementById('f-phone').value||null,
+      ciudad: document.getElementById('f-ciudad').value||null,
+      estado: document.getElementById('f-estado').value,
+      pago: document.getElementById('f-pago').value||null,
+      fuente: document.getElementById('f-fuente').value||null,
+      notas: document.getElementById('f-notas').value||null,
+      coach_id: 'jhon_rojas'
+    });
+    if(error) throw error;
+    showToast('✅ Lead guardado en Supabase','ok');
+    ['f-nombre','f-phone','f-ciudad','f-notas'].forEach(id=>document.getElementById(id).value='');
+    loadDash();
+  } catch(e) {
+    showToast('Error: '+e.message,'err');
+  } finally {
+    btn.innerHTML = 'Guardar lead en Supabase';
+    btn.disabled = false;
+  }
+}
+
+async function delLead(id) {
+  if(!confirm('¿Eliminar este lead?')) return;
+  const {error} = await db.from('leads').delete().eq('id',id);
+  if(error){showToast('Error: '+error.message,'err');return;}
+  showToast('Lead eliminado','ok');
+  loadLeads(); loadDash();
+}
+
+async function changeStatus(id, estado) {
+  const {error} = await db.from('leads').update({estado}).eq('id',id);
+  if(error){showToast('Error: '+error.message,'err');return;}
+  showToast('Estado actualizado ✅','ok');
+  loadLeads(); loadDash();
+}
+
+function badge(s){
+  const m={hot:'<span class="badge bh">Caliente</span>',warm:'<span class="badge bw">Tibio</span>',cold:'<span class="badge bc">Frío</span>',closed:'<span class="badge bx">Cerrado</span>'};
+  return m[s]||s;
+}
+
+function show(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+}
+
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type+' show';
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+function calcC(){
+  const v=document.querySelector('input[name=pt]:checked').value;
+  let total,sub,rows;
+  if(v==='contado'){
+    total=300000+Math.round(3700000*.65);
+    sub='Matrícula + 65% de $3.7M';
+    rows=[['Precio','$3.700.000'],['Matrícula','$300.000'],['65%','$2.105.000'],['Total','$2.405.000']];
+  } else {
+    total=300000+Math.round(4800000*.65);
+    sub='Matrícula + 65% de $4.8M';
+    rows=[['Precio','$4.800.000'],['Matrícula','$300.000'],['65%','$3.120.000'],['Total','$3.420.000']];
+  }
+  document.getElementById('c-total').textContent='$'+total.toLocaleString('es-CO');
+  document.getElementById('c-sub').textContent=sub;
+  document.getElementById('c-breakdown').innerHTML=rows.map(r=>
+    `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9"><span style="color:#64748b">${r[0]}</span><span style="font-weight:600">${r[1]}</span></div>`
+  ).join('');
+}
+
+function simC(){
+  const n=parseInt(document.getElementById('sl').value);
+  document.getElementById('sl-n').textContent=n;
+  document.getElementById('sim-c').textContent='$'+(n*2405000).toLocaleString('es-CO');
+  document.getElementById('sim-q').textContent='$'+(n*3420000).toLocaleString('es-CO');
+}
+
+init(); calcC(); simC();
+</script>
+</body>
+</html>
