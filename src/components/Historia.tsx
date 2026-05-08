@@ -99,7 +99,7 @@ export default function Historia() {
 
           {/* Grid de fotos */}
           <motion.div
-            className="hidden lg:grid grid-cols-2 gap-4"
+            className="grid grid-cols-2 gap-4 mt-8 lg:mt-0"
             initial={{ opacity: 0, x: 30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
