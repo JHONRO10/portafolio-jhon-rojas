@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 
 const SYSTEM_PROMPT = `Eres ARIA, el asistente AI de Jhon Rojas — emprendedor colombiano, constructor de sistemas AI y coach ontológico certificado en Bogotá.
 
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const { messages } = await req.json()
 
     if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ error: 'API key no configurada' }, { status: 500 })
+      return new Response(JSON.stringify({ error: 'API key no configurada' }), { status: 500 })
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -53,18 +53,55 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: 'gpt-4o',
         max_tokens: 1000,
+        stream: true,
         messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
       }),
     })
 
     if (!response.ok) {
       const err = await response.json()
-      return NextResponse.json({ error: err.error?.message || 'Error OpenAI' }, { status: 500 })
+      return new Response(JSON.stringify({ error: err.error?.message || 'Error OpenAI' }), { status: 500 })
     }
 
-    const data = await response.json()
-    return NextResponse.json({ content: data.choices[0].message.content })
-  } catch (error) {
-    return NextResponse.json({ error: 'Error interno' }, { status: 500 })
+    const stream = new ReadableStream({
+      async start(controller) {
+        const reader = response.body!.getReader()
+        const decoder = new TextDecoder()
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value, { stream: true })
+          const lines = chunk.split('\n').filter((l) => l.startsWith('data: '))
+
+          for (const line of lines) {
+            const data = line.slice(6)
+            if (data === '[DONE]') {
+              controller.close()
+              return
+            }
+            try {
+              const parsed = JSON.parse(data)
+              const content = parsed.choices[0]?.delta?.content
+              if (content) {
+                controller.enqueue(new TextEncoder().encode(content))
+              }
+            } catch {}
+          }
+        }
+        controller.close()
+      },
+    })
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'X-Accel-Buffering': 'no',
+      },
+    })
+  } catch {
+    return new Response(JSON.stringify({ error: 'Error interno' }), { status: 500 })
   }
 }

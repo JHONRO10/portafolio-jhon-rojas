@@ -7,6 +7,7 @@ import QRCode from 'qrcode'
 interface Message {
   role: 'user' | 'assistant'
   content: string
+  time?: string
 }
 
 const SUGGESTIONS = [
@@ -16,17 +17,26 @@ const SUGGESTIONS = [
   '¿Cuál es el futuro de la IA?',
 ]
 
+const GREETING = '¡Hola! Soy ARIA, la asistente AI de Jhon Rojas. ¿Sobre qué quieres conversar hoy? Puedo hablarte de inteligencia artificial, coaching ontológico o cómo transformar tu negocio.'
+
 const PORTFOLIO_URL = 'https://portafolio-jhon-rojas.vercel.app'
+
+function getTime() {
+  return new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })
+}
 
 export default function ARIAChat() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [streaming, setStreaming] = useState(false)
   const [showQR, setShowQR] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
+  const [greeted, setGreeted] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
+  // Generar QR
   useEffect(() => {
     QRCode.toDataURL(PORTFOLIO_URL, {
       width: 220,
@@ -35,28 +45,77 @@ export default function ARIAChat() {
     }).then(setQrDataUrl).catch(() => {})
   }, [])
 
+  // Scroll al último mensaje
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
+  // Saludo automático al abrir por primera vez
+  useEffect(() => {
+    if (open && !greeted) {
+      setGreeted(true)
+      setLoading(true)
+      const timer = setTimeout(() => {
+        setLoading(false)
+        setStreaming(true)
+        const msg: Message = { role: 'assistant', content: '', time: getTime() }
+        setMessages([msg])
+        let i = 0
+        const chars = GREETING.split('')
+        const interval = setInterval(() => {
+          i++
+          setMessages([{ ...msg, content: chars.slice(0, i).join('') }])
+          if (i >= chars.length) {
+            clearInterval(interval)
+            setStreaming(false)
+          }
+        }, 18)
+      }, 900)
+      return () => clearTimeout(timer)
+    }
+  }, [open, greeted])
+
   async function sendMessage(text: string) {
-    if (!text.trim() || loading) return
-    const newMessages: Message[] = [...messages, { role: 'user', content: text }]
-    setMessages(newMessages)
+    if (!text.trim() || loading || streaming) return
+    const time = getTime()
+    const userMsg: Message = { role: 'user', content: text, time }
+    const history = [...messages, userMsg]
+    setMessages(history)
     setInput('')
     setLoading(true)
+
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({
+          messages: history.map(({ role, content }) => ({ role, content })),
+        }),
       })
-      const data = await res.json()
-      setMessages([...newMessages, { role: 'assistant', content: data.content || data.error }])
+
+      if (!res.ok || !res.body) throw new Error('Error de servidor')
+
+      // Empezar a mostrar respuesta vacía
+      const assistantMsg: Message = { role: 'assistant', content: '', time: getTime() }
+      setMessages([...history, assistantMsg])
+      setLoading(false)
+      setStreaming(true)
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let accumulated = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        accumulated += decoder.decode(value, { stream: true })
+        setMessages([...history, { ...assistantMsg, content: accumulated }])
+      }
     } catch {
-      setMessages([...newMessages, { role: 'assistant', content: 'Error de conexión. Intenta de nuevo.' }])
+      setMessages([...history, { role: 'assistant', content: 'Error de conexión. Intenta de nuevo.', time: getTime() }])
     } finally {
       setLoading(false)
+      setStreaming(false)
     }
   }
 
@@ -114,7 +173,7 @@ export default function ARIAChat() {
                   <div className="font-bold text-sm" style={{ fontFamily: 'var(--font-syne)', color: '#00CFFF' }}>ARIA</div>
                   <div className="text-xs flex items-center gap-1" style={{ color: '#5A6580' }}>
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block animate-pulse" />
-                    AI de Jhon Rojas
+                    {streaming ? 'escribiendo...' : 'AI de Jhon Rojas'}
                   </div>
                 </div>
               </div>
@@ -129,7 +188,7 @@ export default function ARIAChat() {
 
             {/* Mensajes */}
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
-              {messages.length === 0 && (
+              {messages.length === 0 && !loading && (
                 <div className="text-center mt-4">
                   <div className="text-3xl mb-2">🤖</div>
                   <p className="text-sm font-semibold mb-1" style={{ fontFamily: 'var(--font-syne)', color: '#00CFFF' }}>Hola, soy ARIA</p>
@@ -150,7 +209,7 @@ export default function ARIAChat() {
               )}
 
               {messages.map((m, i) => (
-                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div key={i} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
                   <div
                     className="max-w-[85%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed"
                     style={m.role === 'user'
@@ -162,10 +221,23 @@ export default function ARIAChat() {
                       <div className="text-xs font-semibold mb-1" style={{ color: '#00CFFF', fontFamily: 'var(--font-syne)' }}>ARIA</div>
                     )}
                     {m.content}
+                    {/* Cursor parpadeante en el último mensaje de ARIA mientras escribe */}
+                    {streaming && i === messages.length - 1 && m.role === 'assistant' && (
+                      <motion.span
+                        animate={{ opacity: [1, 0, 1] }}
+                        transition={{ duration: 0.8, repeat: Infinity }}
+                        className="inline-block w-0.5 h-3.5 ml-0.5 align-middle rounded"
+                        style={{ background: '#00CFFF' }}
+                      />
+                    )}
                   </div>
+                  {m.time && (
+                    <span className="text-xs mt-1 px-1" style={{ color: '#3A4560' }}>{m.time}</span>
+                  )}
                 </div>
               ))}
 
+              {/* Dots de carga (solo antes de que empiece el stream) */}
               {loading && (
                 <div className="flex justify-start">
                   <div className="px-4 py-3 rounded-2xl rounded-bl-sm flex gap-1 items-center" style={{ background: 'rgba(0,207,255,0.1)', border: '1px solid rgba(0,207,255,0.2)' }}>
@@ -178,6 +250,23 @@ export default function ARIAChat() {
                   </div>
                 </div>
               )}
+
+              {/* Sugerencias después del saludo */}
+              {messages.length === 1 && !loading && !streaming && (
+                <div className="flex flex-col gap-2 mt-1">
+                  {SUGGESTIONS.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => sendMessage(s)}
+                      className="text-xs text-left px-3 py-2 rounded-xl transition-all hover:opacity-80"
+                      style={{ background: 'rgba(0,207,255,0.06)', border: '1px solid rgba(0,207,255,0.15)', color: '#8A9BB8' }}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div ref={bottomRef} />
             </div>
 
@@ -191,10 +280,11 @@ export default function ARIAChat() {
                   placeholder="Escribe tu pregunta..."
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm outline-none"
                   style={{ background: '#0C1220', border: '1px solid rgba(0,207,255,0.15)', color: '#F0F4FF' }}
+                  disabled={loading || streaming}
                 />
                 <button
                   onClick={() => sendMessage(input)}
-                  disabled={!input.trim() || loading}
+                  disabled={!input.trim() || loading || streaming}
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:opacity-80 disabled:opacity-40"
                   style={{ background: '#00CFFF' }}
                 >
