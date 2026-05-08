@@ -116,8 +116,8 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.2 }}
         >
           <div
-            className="relative w-full rounded-2xl overflow-hidden"
-            style={{ height: 520, border: '1px solid var(--border)' }}
+            className="relative w-full rounded-2xl overflow-hidden h-[420px] lg:h-[520px]"
+            style={{ border: '1px solid var(--border)' }}
           >
             <Image
               src="/foto2.jpg"
@@ -130,7 +130,7 @@ export default function Hero() {
 
           {/* Tarjeta flotante inferior */}
           <motion.div
-            className="absolute -bottom-6 -left-8 flex items-center gap-3 px-5 py-4 rounded-2xl"
+            className="absolute -bottom-6 left-4 lg:-left-8 flex items-center gap-3 px-4 py-3 rounded-2xl"
             style={{
               background: 'var(--card)',
               border: '1px solid var(--border)',
@@ -156,7 +156,7 @@ export default function Hero() {
 
           {/* Tarjeta flotante superior */}
           <motion.div
-            className="absolute top-8 -right-6 text-center px-5 py-4 rounded-2xl"
+            className="absolute top-8 right-4 lg:-right-6 text-center px-4 py-3 rounded-2xl"
             style={{
               background: 'var(--card)',
               border: '1px solid rgba(255,92,43,.2)',

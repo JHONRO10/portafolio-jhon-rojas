@@ -1,3 +1,4 @@
+import ARIAChat from '@/components/ARIAChat'
 import type { Metadata } from 'next'
 import { Syne, DM_Sans } from 'next/font/google'
 import './globals.css'
@@ -41,7 +42,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${syne.variable} ${dmSans.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ARIAChat />
+      </body>
     </html>
   )
 }
