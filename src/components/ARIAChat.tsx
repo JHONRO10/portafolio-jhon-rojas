@@ -33,7 +33,7 @@ export default function ARIAChat() {
   const [streaming, setStreaming] = useState(false)
   const [showQR, setShowQR] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
-  const [greeted, setGreeted] = useState(false)
+  const greetedRef = useRef(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   // Generar QR
@@ -52,28 +52,33 @@ export default function ARIAChat() {
 
   // Saludo automático al abrir por primera vez
   useEffect(() => {
-    if (open && !greeted) {
-      setGreeted(true)
-      setLoading(true)
-      const timer = setTimeout(() => {
-        setLoading(false)
-        setStreaming(true)
-        const msg: Message = { role: 'assistant', content: '', time: getTime() }
-        setMessages([msg])
-        let i = 0
-        const chars = GREETING.split('')
-        const interval = setInterval(() => {
-          i++
-          setMessages([{ ...msg, content: chars.slice(0, i).join('') }])
-          if (i >= chars.length) {
-            clearInterval(interval)
-            setStreaming(false)
-          }
-        }, 18)
-      }, 900)
-      return () => clearTimeout(timer)
+    if (!open || greetedRef.current) return
+    greetedRef.current = true
+    setLoading(true)
+
+    let interval: ReturnType<typeof setInterval>
+    const timer = setTimeout(() => {
+      setLoading(false)
+      setStreaming(true)
+      const msg: Message = { role: 'assistant', content: '', time: getTime() }
+      setMessages([msg])
+      let i = 0
+      const chars = GREETING.split('')
+      interval = setInterval(() => {
+        i++
+        setMessages([{ ...msg, content: chars.slice(0, i).join('') }])
+        if (i >= chars.length) {
+          clearInterval(interval)
+          setStreaming(false)
+        }
+      }, 18)
+    }, 900)
+
+    return () => {
+      clearTimeout(timer)
+      clearInterval(interval)
     }
-  }, [open, greeted])
+  }, [open])
 
   async function sendMessage(text: string) {
     if (!text.trim() || loading || streaming) return
