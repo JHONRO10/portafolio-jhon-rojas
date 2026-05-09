@@ -107,13 +107,19 @@ export default function ARIAChat() {
       setStreaming(true)
 
       const reader = res.body.getReader()
-      const decoder = new TextDecoder()
+      const decoder = new TextDecoder('utf-8', { fatal: false })
       let accumulated = ''
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
         accumulated += decoder.decode(value, { stream: true })
+        setMessages([...history, { ...assistantMsg, content: accumulated }])
+      }
+      // Flush final — libera bytes pendientes (tildes, ñ, signos especiales)
+      const remaining = decoder.decode()
+      if (remaining) {
+        accumulated += remaining
         setMessages([...history, { ...assistantMsg, content: accumulated }])
       }
     } catch {
@@ -203,7 +209,7 @@ export default function ARIAChat() {
                       <button
                         key={s}
                         onClick={() => sendMessage(s)}
-                        className="text-xs text-left px-3 py-2 rounded-xl transition-all hover:opacity-80"
+                        className="text-[13px] text-left px-3 py-2.5 rounded-xl transition-all hover:opacity-80"
                         style={{ background: 'rgba(0,207,255,0.08)', border: '1px solid rgba(0,207,255,0.2)', color: '#F0F4FF' }}
                       >
                         {s}
@@ -216,11 +222,16 @@ export default function ARIAChat() {
               {messages.map((m, i) => (
                 <div key={i} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
                   <div
-                    className="max-w-[85%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed"
-                    style={m.role === 'user'
-                      ? { background: 'rgba(255,92,43,0.2)', border: '1px solid rgba(255,92,43,0.3)', borderBottomRightRadius: 4, color: '#F0F4FF' }
-                      : { background: 'rgba(0,207,255,0.1)', border: '1px solid rgba(0,207,255,0.2)', borderBottomLeftRadius: 4, color: '#F0F4FF' }
-                    }
+                    className="max-w-[85%] px-4 py-2.5 rounded-2xl leading-relaxed break-words"
+                    style={{
+                      fontSize: '15px',
+                      wordBreak: 'break-word',
+                      overflowWrap: 'break-word',
+                      ...(m.role === 'user'
+                        ? { background: 'rgba(255,92,43,0.2)', border: '1px solid rgba(255,92,43,0.3)', borderBottomRightRadius: 4, color: '#F0F4FF' }
+                        : { background: 'rgba(0,207,255,0.1)', border: '1px solid rgba(0,207,255,0.2)', borderBottomLeftRadius: 4, color: '#F0F4FF' }
+                      )
+                    }}
                   >
                     {m.role === 'assistant' && (
                       <div className="text-xs font-semibold mb-1" style={{ color: '#00CFFF', fontFamily: 'var(--font-syne)' }}>ARIA</div>
@@ -263,7 +274,7 @@ export default function ARIAChat() {
                     <button
                       key={s}
                       onClick={() => sendMessage(s)}
-                      className="text-xs text-left px-3 py-2 rounded-xl transition-all hover:opacity-80"
+                      className="text-[13px] text-left px-3 py-2.5 rounded-xl transition-all hover:opacity-80"
                       style={{ background: 'rgba(0,207,255,0.06)', border: '1px solid rgba(0,207,255,0.15)', color: '#8A9BB8' }}
                     >
                       {s}
@@ -283,8 +294,8 @@ export default function ARIAChat() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
                   placeholder="Escribe tu pregunta..."
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm outline-none"
-                  style={{ background: '#0C1220', border: '1px solid rgba(0,207,255,0.15)', color: '#F0F4FF' }}
+                  className="flex-1 px-4 py-2.5 rounded-xl outline-none"
+                  style={{ fontSize: '15px', background: '#0C1220', border: '1px solid rgba(0,207,255,0.15)', color: '#F0F4FF' }}
                   disabled={loading || streaming}
                 />
                 <button
