@@ -72,11 +72,18 @@ export default function Hero() {
 
           {/* Subtitle */}
           <p
-            className="text-lg mb-8 font-light max-w-lg leading-relaxed"
+            className="text-lg mb-4 font-light max-w-lg leading-relaxed"
             style={{ color: 'rgba(240,244,255,.7)' }}
           >
             Construyo agentes AI, CRMs inteligentes y automatizaciones en WhatsApp
             para que tu equipo deje de hacer trabajo manual y empiece a cerrar más ventas.
+          </p>
+
+          <p
+            className="text-sm mb-8 max-w-lg leading-relaxed italic"
+            style={{ color: 'var(--orange)', fontFamily: 'var(--font-syne)', fontWeight: 600 }}
+          >
+            Transformamos mentes. Automatizamos resultados.
           </p>
 
           {/* CTAs */}

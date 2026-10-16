@@ -2,7 +2,9 @@ import Nav from '@/components/Nav'
 import Hero from '@/components/Hero'
 import Problema from '@/components/Problema'
 import AriaDemo from '@/components/AriaDemo'
+import CasosExito from '@/components/CasosExito'
 import Servicios from '@/components/Servicios'
+import Proceso from '@/components/Proceso'
 import Historia from '@/components/Historia'
 import Stack from '@/components/Stack'
 import CtaFinal from '@/components/CtaFinal'
@@ -17,7 +19,9 @@ export default function Home() {
       <Problema />
       <AriaDemo />
       <div className="divider" />
+      <CasosExito />
       <Servicios />
+      <Proceso />
       <Historia />
       <Stack />
       <CtaFinal />

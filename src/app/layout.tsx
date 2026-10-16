@@ -18,23 +18,23 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'Jhon Rojas — Sistemas AI para Negocios',
+  title: 'Jhon Rojas — Sistemas AI & Coaching Ontológico',
   description:
-    'Construyo agentes AI, CRMs inteligentes y automatizaciones en WhatsApp para que tu negocio cierre más ventas. Bogotá, Colombia.',
-  keywords: ['AI', 'automatización', 'WhatsApp bot', 'CRM', 'agente AI', 'Colombia', 'ARIA'],
+    'Construyo agentes AI, CRMs inteligentes y automatizaciones en WhatsApp para que tu negocio cierre más ventas — y acompaño procesos de coaching ontológico. Bogotá, Colombia.',
+  keywords: ['AI', 'automatización', 'WhatsApp bot', 'CRM', 'agente AI', 'coaching ontológico', 'Colombia', 'ARIA'],
   authors: [{ name: 'Jhon Rojas' }],
   openGraph: {
-    title: 'Jhon Rojas — Sistemas AI para Negocios',
+    title: 'Jhon Rojas — Sistemas AI & Coaching Ontológico',
     description:
-      'Agentes AI, CRMs inteligentes y automatizaciones en WhatsApp. Bogotá, Colombia.',
+      'Agentes AI, CRMs inteligentes, automatizaciones en WhatsApp y coaching ontológico. Bogotá, Colombia.',
     type: 'website',
     locale: 'es_CO',
-    siteName: 'Jhon Rojas AI',
+    siteName: 'Jhon Rojas',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Jhon Rojas — Sistemas AI para Negocios',
-    description: 'Agentes AI, CRMs inteligentes y automatizaciones en WhatsApp.',
+    title: 'Jhon Rojas — Sistemas AI & Coaching Ontológico',
+    description: 'Agentes AI, CRMs inteligentes, automatizaciones en WhatsApp y coaching ontológico.',
   },
   robots: { index: true, follow: true },
 }

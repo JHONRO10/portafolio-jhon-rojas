@@ -49,6 +49,20 @@ const services = [
     ],
     featured: false,
   },
+  {
+    icon: '🧭',
+    name: 'Coaching Ontológico & Mentoría',
+    desc: 'Acompañamiento 1:1 o para equipos, desde la ontología del lenguaje: identidad, decisiones, liderazgo.',
+    price: 'Cotización',
+    period: 'según programa',
+    includes: [
+      'Sesiones 1:1 o grupales',
+      'Marco de coaching ontológico',
+      'Aplicable a líderes y equipos',
+      'Formación certificada ADH',
+    ],
+    featured: false,
+  },
 ]
 
 export default function Servicios() {
@@ -79,15 +93,15 @@ export default function Servicios() {
               letterSpacing: '-0.03em',
             }}
           >
-            ¿Qué puedo construir<br />para tu negocio?
+            ¿Qué puedo construir<br />para ti o tu negocio?
           </h2>
           <p className="text-base max-w-lg leading-relaxed" style={{ color: 'rgba(240,244,255,.6)' }}>
-            Sistemas reales, no promesas. Cada solución está construida con IA y automatizaciones
-            que funcionan desde el día uno.
+            Sistemas reales, no promesas — y un acompañamiento humano cuando lo que necesitas
+            no lo resuelve un bot.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
           {services.map((s, i) => (
             <motion.div
               key={s.name}
