@@ -1,12 +1,8 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import Hero from '@/components/Hero'
 import Declaracion from '@/components/Declaracion'
 import CtaBanda from '@/components/CtaBanda'
 import PhotoSlot from '@/components/PhotoSlot'
-
-// FOTO PROVISIONAL — jhon-banda.jpg ya es la foto real aprobada del paquete.
-const FOTO_BANDA = '/jhon-banda.jpg'
 
 const CIFRAS = [
   { n: '416', label: 'Horas de certificación' },
@@ -18,7 +14,11 @@ const CIFRAS = [
 export default function Home() {
   return (
     <>
-      <Hero firma="Hola, soy" titulo="Jhon Rojas" photo={{ kind: 'video' }}>
+      <Hero
+        firma="Hola, soy"
+        titulo="Jhon Rojas"
+        photo={{ kind: 'placeholder', label: 'Espacio para tu foto', sublabel: 'Retrato o video corto presentándote' }}
+      >
         <p className="lead" style={{ fontWeight: 600, color: 'var(--negro)', fontSize: 18 }}>
           Coach Ontológico. Emprendedor. Acompaño a personas que saben lo que tienen que hacer
           y no han podido solas.
@@ -50,9 +50,15 @@ export default function Home() {
         </div>
       </section>
 
-      <div style={{ position: 'relative' }} className="sangre">
-        <Image src={FOTO_BANDA} alt="Jhon Rojas" fill style={{ objectFit: 'cover' }} />
-      </div>
+      <section className="band" style={{ paddingTop: 0 }}>
+        <div className="wrap">
+          <PhotoSlot
+            label="Espacio para tu foto"
+            sublabel="Banda ancha, tú en acción — a todo el ancho de pantalla"
+            aspectRatio="21/7"
+          />
+        </div>
+      </section>
 
       <section className="band" style={{ paddingBlock: 64 }}>
         <div className="wrap nums">
