@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        disp: ['var(--font-archivo)', 'sans-serif'],
+        disp: ['var(--font-anton)', 'sans-serif'],
         firma: ['var(--font-caveat)', 'cursive'],
         sans: ['var(--font-montserrat)', 'sans-serif'],
       },

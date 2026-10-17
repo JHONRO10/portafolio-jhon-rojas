@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
-import { Archivo_Black, Caveat, Montserrat } from 'next/font/google'
+import { Anton, Caveat, Montserrat } from 'next/font/google'
+import Nav from '@/components/Nav'
+import Footer from '@/components/Footer'
 import './globals.css'
 
-const archivoBlack = Archivo_Black({
+const anton = Anton({
   subsets: ['latin'],
   weight: '400',
-  variable: '--font-archivo',
+  variable: '--font-anton',
   display: 'swap',
 })
 
@@ -19,7 +21,6 @@ const caveat = Caveat({
 const montserrat = Montserrat({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
   variable: '--font-montserrat',
   display: 'swap',
 })
@@ -48,8 +49,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${archivoBlack.variable} ${caveat.variable} ${montserrat.variable}`}>
-      <body>{children}</body>
+    <html lang="es" className={`${anton.variable} ${caveat.variable} ${montserrat.variable}`}>
+      <body>
+        <Nav />
+        {children}
+        <Footer />
+      </body>
     </html>
   )
 }

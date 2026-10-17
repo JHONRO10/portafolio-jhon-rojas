@@ -1,9 +1,17 @@
-export default function Declaracion() {
+export default function Declaracion({
+  fuerte,
+  tenue,
+  maxWidth = 960,
+}: {
+  fuerte: string
+  tenue: string
+  maxWidth?: number
+}) {
   return (
-    <section className="band" style={{ paddingBlock: 40 }}>
-      <div className="wrap" style={{ maxWidth: 900, textAlign: 'center' }}>
+    <section className="band" style={{ paddingBlock: 30 }}>
+      <div className="wrap" style={{ maxWidth, textAlign: 'center' }}>
         <h2 className="disp">
-          No es que no puedas. <span className="dim">Es que te apagaste antes de cogerle el hilo.</span>
+          {fuerte} <span className="dim">{tenue}</span>
         </h2>
       </div>
     </section>
