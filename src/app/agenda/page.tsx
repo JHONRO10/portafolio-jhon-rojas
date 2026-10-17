@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import PhotoSlot from '@/components/PhotoSlot'
+import AgendaForm from '@/components/AgendaForm'
 
 export const metadata: Metadata = {
   title: 'Agenda tu conversación — Jhon Rojas',
 }
-
-const WA = 'https://wa.me/573006800524?text=Hola%20Jhon%2C%20quiero%20agendar%20una%20hora'
 
 export default function Agenda() {
   return (
@@ -31,23 +30,7 @@ export default function Agenda() {
             style={{ marginTop: 34 }}
           />
         </div>
-        <div className="form">
-          <h3 className="disp">Agenda tu conversación</h3>
-          <input type="text" id="ag-nombre" placeholder="Nombre completo" />
-          <input type="email" id="ag-correo" placeholder="Correo electrónico" />
-          <input type="tel" id="ag-tel" placeholder="WhatsApp / teléfono" />
-          <select id="ag-tipo" defaultValue="">
-            <option value="" disabled>Tipo de sesión</option>
-            <option>Conversación 1:1 — $30 USD</option>
-            <option>Taller — $90 USD</option>
-            <option>Organizacional — cotización</option>
-          </select>
-          <textarea id="ag-meta" placeholder="¿Qué te gustaría lograr?" />
-          <a className="btn" href={WA} target="_blank" rel="noopener noreferrer">
-            Quiero mi conversación →
-          </a>
-          <p className="nota">Te respondo por WhatsApp el mismo día.</p>
-        </div>
+        <AgendaForm />
       </div>
     </section>
   )
