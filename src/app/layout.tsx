@@ -1,51 +1,55 @@
-import ARIAChat from '@/components/ARIAChat'
 import type { Metadata } from 'next'
-import { Syne, DM_Sans } from 'next/font/google'
+import { Archivo_Black, Caveat, Montserrat } from 'next/font/google'
 import './globals.css'
 
-const syne = Syne({
+const archivoBlack = Archivo_Black({
   subsets: ['latin'],
-  variable: '--font-syne',
-  weight: ['400', '600', '700', '800'],
+  weight: '400',
+  variable: '--font-archivo',
   display: 'swap',
 })
 
-const dmSans = DM_Sans({
+const caveat = Caveat({
   subsets: ['latin'],
-  variable: '--font-dm',
-  weight: ['300', '400', '500'],
+  weight: ['600'],
+  variable: '--font-caveat',
+  display: 'swap',
+})
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-montserrat',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'Jhon Rojas — Sistemas AI & Coaching Ontológico',
+  title: 'Jhon Rojas — Coach Ontológico',
   description:
-    'Construyo agentes AI, CRMs inteligentes y automatizaciones en WhatsApp para que tu negocio cierre más ventas — y acompaño procesos de coaching ontológico. Bogotá, Colombia.',
-  keywords: ['AI', 'automatización', 'WhatsApp bot', 'CRM', 'agente AI', 'coaching ontológico', 'Colombia', 'ARIA'],
+    'Coach Ontológico. Emprendedor. Acompaño a personas que saben lo que tienen que hacer y no han podido solas. Bogotá, Colombia.',
+  keywords: ['coaching ontológico', 'coach', 'Bogotá', 'Colombia', 'ADH Coaching', 'transformación personal'],
   authors: [{ name: 'Jhon Rojas' }],
   openGraph: {
-    title: 'Jhon Rojas — Sistemas AI & Coaching Ontológico',
+    title: 'Jhon Rojas — Coach Ontológico',
     description:
-      'Agentes AI, CRMs inteligentes, automatizaciones en WhatsApp y coaching ontológico. Bogotá, Colombia.',
+      'Coach Ontológico certificado. Conversaciones que sacan a las personas del lugar donde se creó el problema.',
     type: 'website',
     locale: 'es_CO',
     siteName: 'Jhon Rojas',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Jhon Rojas — Sistemas AI & Coaching Ontológico',
-    description: 'Agentes AI, CRMs inteligentes, automatizaciones en WhatsApp y coaching ontológico.',
+    title: 'Jhon Rojas — Coach Ontológico',
+    description: 'Coach Ontológico certificado. Bogotá, Colombia.',
   },
   robots: { index: true, follow: true },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${syne.variable} ${dmSans.variable}`}>
-      <body>
-        {children}
-        <ARIAChat />
-      </body>
+    <html lang="es" className={`${archivoBlack.variable} ${caveat.variable} ${montserrat.variable}`}>
+      <body>{children}</body>
     </html>
   )
 }

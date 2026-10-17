@@ -9,8 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        syne: ['var(--font-syne)', 'sans-serif'],
-        dm: ['var(--font-dm)', 'sans-serif'],
+        disp: ['var(--font-archivo)', 'sans-serif'],
+        firma: ['var(--font-caveat)', 'cursive'],
+        sans: ['var(--font-montserrat)', 'sans-serif'],
       },
     },
   },

@@ -1,31 +1,29 @@
 import Nav from '@/components/Nav'
 import Hero from '@/components/Hero'
-import Problema from '@/components/Problema'
-import AriaDemo from '@/components/AriaDemo'
-import CasosExito from '@/components/CasosExito'
-import Servicios from '@/components/Servicios'
+import Declaracion from '@/components/Declaracion'
+import Preguntas from '@/components/Preguntas'
+import BandaFoto from '@/components/BandaFoto'
+import Cifras from '@/components/Cifras'
 import Proceso from '@/components/Proceso'
-import Historia from '@/components/Historia'
-import Stack from '@/components/Stack'
-import CtaFinal from '@/components/CtaFinal'
-import Footer from '@/components/Footer'
+import Trayectoria from '@/components/Trayectoria'
+import Formatos from '@/components/Formatos'
+import Cierre from '@/components/Cierre'
 
 export default function Home() {
   return (
     <>
       <Nav />
-      <Hero />
-      <div className="divider" />
-      <Problema />
-      <AriaDemo />
-      <div className="divider" />
-      <CasosExito />
-      <Servicios />
-      <Proceso />
-      <Historia />
-      <Stack />
-      <CtaFinal />
-      <Footer />
+      <div className="shell">
+        <Hero />
+        <Declaracion />
+        <Preguntas />
+        <BandaFoto />
+        <Cifras />
+        <Proceso />
+        <Trayectoria />
+        <Formatos />
+      </div>
+      <Cierre />
     </>
   )
 }
