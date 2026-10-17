@@ -50,15 +50,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="band" style={{ paddingTop: 0 }}>
-        <div className="wrap">
-          <PhotoSlot
-            label="Espacio para tu foto"
-            sublabel="Banda ancha, tú en acción — a todo el ancho de pantalla"
-            aspectRatio="21/7"
-          />
-        </div>
-      </section>
+      <PhotoSlot
+        label="Espacio para tu foto"
+        sublabel="Banda ancha, tú en acción — a todo el ancho de pantalla"
+        aspectRatio="21/7"
+        ancha
+        style={{ borderRadius: 0, borderLeft: 'none', borderRight: 'none' }}
+      />
 
       <section className="band" style={{ paddingBlock: 64 }}>
         <div className="wrap nums">

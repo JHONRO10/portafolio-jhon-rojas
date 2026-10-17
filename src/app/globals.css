@@ -88,6 +88,7 @@ nav {
 .ph b { font-size: 15px; font-weight: 600; color: #3A3A38; }
 .ph span { font-size: 13.5px; color: #8A8A84; }
 .dark .ph { border-color: #3A4A3E; }
+.ph-ancha { width: 100%; }
 
 /* hero */
 .hero { display: grid; grid-template-columns: 1.02fr .98fr; gap: 60px; align-items: center; }
@@ -212,7 +213,7 @@ footer { background: var(--verde); padding: 0 24px 0; }
   .cards3, .cards6, .tools { grid-template-columns: 1fr; }
   .nums { grid-template-columns: 1fr 1fr; gap: 26px; }
   .cta .r { text-align: left; }
-  .sangre { aspect-ratio: 3/2; }
+  .sangre, .ph-ancha { aspect-ratio: 3/2 !important; }
   .fin { grid-template-columns: 1fr; padding-block: 56px 30px; }
   .fnav { text-align: left; }
   nav { padding: 14px 16px; gap: 10px; }
